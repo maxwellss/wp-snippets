@@ -1,0 +1,33 @@
+<?php
+add_action( 'customize_register', 'childtheme_customize_register'); //second argument is arbitrary, but cannot have hyphens because php does not allow them in function names.
+
+
+
+function childtheme_customize_register( $wp_customize ) {
+
+$wp_customize->add_section( 
+    'tesseract_reblog_options', 
+    array(
+        'title'       => __( 'Reblog Options', 'tesseract-child' ), //2nd arg matches child theme name 
+        'priority'    => 6, // put the section below the Footer options on the list
+        'capability'  => 'edit_theme_options',
+        'description' => __('Change Reblog Options Here.', 'tesseract-child'), //2nd arg matches child theme name 
+    ) 
+);
+
+
+$wp_customize->add_setting( 'number_of_reblogs',
+    array(
+        'default' => '3'
+    )
+);  
+
+$wp_customize->add_control( 'setting_id', array(
+  'label'    => __( 'Number of Reblogs', 'tesseract-child' ), //2nd arg matches child theme name
+    'section'  => 'tesseract_reblog_options',
+    'settings' => 'number_of_reblogs',
+    'type'     => 'text',
+    'priority' => 6
+) );
+}
+?>

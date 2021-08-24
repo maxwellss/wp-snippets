@@ -1,0 +1,22 @@
+<?php
+/* copied from https://wordpress.stackexchange.com/questions/250225/how-to-add-customizer-setting-in-child-theme */
+
+add_action( "customize_register", "ruth_sherman_theme_customize_register" );
+function ruth_sherman_theme_customize_register( $wp_customize ) {
+
+ //=============================================================
+ // Remove header image and widgets option from theme customizer
+ //=============================================================
+ $wp_customize->remove_control("header_image");
+ //$wp_customize->remove_panel("widgets");
+
+ //=============================================================
+ // Remove Colors, Background image, and Static front page 
+ // option from theme customizer     
+ //=============================================================
+ $wp_customize->remove_section("ecommerce-plus");
+ $wp_customize->remove_section("background_image");
+ $wp_customize->remove_section("static_front_page");
+
+}
+?>

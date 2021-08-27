@@ -1,0 +1,76 @@
+
+
+/*=======================
+  GENERATE A COUPON
+-----------------------------*/
+//add_action('wpcf7_mail_sent', 'dbo_install_coupon',1);
+
+function dbo_install_coupon($coupon){
+    
+    $new_coupon_id = wp_insert_post( $coupon );
+    
+    $amount = '20'; // Amount
+    $discount_type = 'fixed_product'; // Type: fixed_cart, percent, fixed_product, percent_product
+
+    $next_month = date('Y-m-d', time() + (60*60*24*31)); 
+    // Add meta
+    update_post_meta( $new_coupon_id, 'discount_type', $discount_type );
+    update_post_meta( $new_coupon_id, 'coupon_amount', $amount );
+    update_post_meta( $new_coupon_id, 'individual_use', 'yes' );
+    update_post_meta( $new_coupon_id, 'product_ids', '' );
+    update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
+    update_post_meta( $new_coupon_id, 'usage_limit', '1' );
+    update_post_meta( $new_coupon_id, 'expiry_date', $next_month );
+    update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
+    update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
+
+    
+    //do_action('dbo_update_form_messages');
+}
+
+function dbo_gen_rand($cnt){
+    $seed = str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'); // and any other characters
+    shuffle($seed); // probably optional since array_is randomized; this may be redundant
+    $rand = '';
+    foreach (array_rand($seed, $cnt) as $k) $rand .= $seed[$k];    
+    return $rand;
+}
+
+function dbo_make_coupon(){
+    $rStr = dbo_gen_rand(4);
+    $coupon_code = '20-'.$rStr; // Code - perhaps generate this from the user ID + the order ID
+   
+
+    $coupon = array(
+        'post_title' => $coupon_code,
+        'post_content' => '',
+        'post_status' => 'publish',
+        'post_author' => 1,
+        'post_type'     => 'shop_coupon'
+    ); 
+    return $coupon;   
+
+}
+
+
+function dbo_update_cf7_success( $contact_form, $abort, $submission ) {
+    
+    $coupon = dbo_make_coupon();
+    $properties = $contact_form->get_properties();
+    $email = $submission->get_posted_data('your-email');
+    //$email = $properties['form']['email'];
+   
+    if (!dbo_add_user($email)){
+        $properties['messages']['mail_sent_ok'] = "You are already subscribed. Please <a href=". "/wp-admin/>login</a> or contact us.";
+    } else {
+    
+    $properties['messages']['mail_sent_ok'] = "Welcome aboard. Please use the following coupon code for a $20 store discount  <em> ". $coupon['post_title']."</em>";
+    }
+    $contact_form->set_properties($properties);
+   dbo_install_coupon($coupon);
+
+    return $contact_form;
+    
+}
+add_filter( 'wpcf7_before_send_mail', 'dbo_update_cf7_success', 10, 3 );
+

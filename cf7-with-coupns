@@ -1,4 +1,4 @@
-
+<?php
 
 /*=======================
   GENERATE A COUPON
@@ -73,4 +73,4 @@ function dbo_update_cf7_success( $contact_form, $abort, $submission ) {
     
 }
 add_filter( 'wpcf7_before_send_mail', 'dbo_update_cf7_success', 10, 3 );
-
+?>
